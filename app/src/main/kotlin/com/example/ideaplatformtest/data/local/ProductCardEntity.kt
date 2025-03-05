@@ -8,7 +8,7 @@ data class ProductCardEntity(
     @PrimaryKey
     val id: Int,
     val name: String,
-    val time: Int,
+    val time: Long,
     val tags: String,
     val amount: Int,
 )

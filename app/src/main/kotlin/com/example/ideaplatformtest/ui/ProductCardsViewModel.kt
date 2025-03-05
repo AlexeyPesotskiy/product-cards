@@ -12,11 +12,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductCardsViewModel @Inject constructor(
-    private val repository: ProductCardsRepository,
-    initialState: ProductCardsUiState = ProductCardsUiState(),
+    private val repository: ProductCardsRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(initialState)
+    private val _uiState = MutableStateFlow(ProductCardsUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -26,6 +25,12 @@ class ProductCardsViewModel @Inject constructor(
     fun updateSearchQuery(newSearchQuery: String) = _uiState.update {
         it.copy(
             searchQuery = newSearchQuery,
+        )
+    }
+
+    fun openEditProductAmountDialog(currentAmount: Int) = _uiState.update {
+        it.copy(
+            productAmountInDialog = currentAmount,
         )
     }
 
