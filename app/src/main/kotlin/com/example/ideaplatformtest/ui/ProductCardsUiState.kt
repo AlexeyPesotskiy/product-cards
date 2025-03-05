@@ -7,5 +7,8 @@ import com.example.ideaplatformtest.domain.ProductCard
 data class ProductCardsUiState(
     val searchQuery: String = "",
     val productCardsList: List<ProductCard> = emptyList(),
-    val productAmountInDialog: Int = 0,
+    val dialogCardId: Int = 0,
+    val showEditDialog: Boolean = false,
+    val productAmountInEditDialog: Int = 0,
+    val showDeleteDialog: Boolean = false,
 )

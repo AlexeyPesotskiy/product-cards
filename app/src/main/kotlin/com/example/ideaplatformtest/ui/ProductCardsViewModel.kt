@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductCardsViewModel @Inject constructor(
-    private val repository: ProductCardsRepository
+    private val repository: ProductCardsRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProductCardsUiState())
@@ -22,35 +22,101 @@ class ProductCardsViewModel @Inject constructor(
         observeProductCardsFlow()
     }
 
-    fun updateSearchQuery(newSearchQuery: String) = _uiState.update {
+    fun onAction(action: ProductCardAction) {
+        when (action) {
+            is ProductCardAction.OnUpdateSearchQuery -> {
+                updateSearchQuery(action.newSearchQuery)
+            }
+            ProductCardAction.OnClearSearchQuery -> clearSearchQuery()
+
+            is ProductCardAction.OnOpenEditAmountDialog -> openEditProductAmountDialog(
+                currentAmount = action.currentAmount,
+                productId = action.productId
+            )
+            ProductCardAction.OnIncreaseProductAmount -> incrementProductAmountInDialog()
+            ProductCardAction.OnDecreaseProductAmount -> decrementProductAmountInDialog()
+            ProductCardAction.OnSaveNewProductAmount -> saveNewAmountOfProduct()
+            ProductCardAction.OnCloseEditAmountDialog -> closeEditProductAmountDialog()
+
+            is ProductCardAction.OnOpenDeleteProductCardDialog -> {
+                openDeleteProductDialog(action.productId)
+            }
+            ProductCardAction.OnDeleteProductCard -> deleteCurrentProduct()
+            ProductCardAction.OnCloseDeleteProductCardDialog -> closeDeleteProductDialog()
+        }
+    }
+
+    private fun updateSearchQuery(newSearchQuery: String) = _uiState.update {
         it.copy(
             searchQuery = newSearchQuery,
         )
     }
 
-    fun openEditProductAmountDialog(currentAmount: Int) = _uiState.update {
+    private fun clearSearchQuery() = _uiState.update {
         it.copy(
-            productAmountInDialog = currentAmount,
+            searchQuery = "",
         )
     }
 
-    fun editProductAmountInDialog(newAmount: Int) = _uiState.update {
+    private fun openEditProductAmountDialog(currentAmount: Int, productId: Int) = _uiState.update {
         it.copy(
-            productAmountInDialog = newAmount,
+            productAmountInEditDialog = currentAmount,
+            dialogCardId = productId,
+            showEditDialog = true,
         )
     }
 
-    fun saveNewAmountOfProduct(newAmount: Int, productId: Int) = viewModelScope.launch {
-        repository.updateAmountInProductCard(
-            newAmount = newAmount,
-            productCardId = productId,
+    private fun incrementProductAmountInDialog() = _uiState.update {
+        it.copy(
+            productAmountInEditDialog = uiState.value.productAmountInEditDialog + 1,
         )
     }
 
-    fun deleteProduct(productId: Int) {
-        viewModelScope.launch {
-            repository.deleteProductCard(productId)
+    private fun decrementProductAmountInDialog() =
+        uiState.value.productAmountInEditDialog.let { amount ->
+            if (amount != 0)
+                _uiState.update {
+                    it.copy(
+                        productAmountInEditDialog = amount - 1,
+                    )
+                }
         }
+
+    private fun closeEditProductAmountDialog() = _uiState.update {
+        it.copy(
+            productAmountInEditDialog = 0,
+            dialogCardId = 0,
+            showEditDialog = false,
+        )
+    }
+
+    private fun saveNewAmountOfProduct() = viewModelScope.launch {
+        repository.updateAmountInProductCard(
+            newAmount = uiState.value.productAmountInEditDialog,
+            productCardId = uiState.value.dialogCardId,
+        )
+        closeEditProductAmountDialog()
+    }
+
+    private fun openDeleteProductDialog(productId: Int) = _uiState.update {
+        it.copy(
+            showDeleteDialog = true,
+            dialogCardId = productId,
+        )
+    }
+
+    private fun closeDeleteProductDialog() = _uiState.update {
+        it.copy(
+            showDeleteDialog = false,
+            dialogCardId = 0,
+        )
+    }
+
+    private fun deleteCurrentProduct() {
+        viewModelScope.launch {
+            repository.deleteProductCard(uiState.value.dialogCardId)
+        }
+        closeDeleteProductDialog()
     }
 
     private fun observeProductCardsFlow() {
@@ -58,7 +124,7 @@ class ProductCardsViewModel @Inject constructor(
             repository.getAllProductsFlow().collect { list ->
                 _uiState.update { state ->
                     state.copy(
-                        productCardsList = list
+                        productCardsList = list,
                     )
                 }
             }

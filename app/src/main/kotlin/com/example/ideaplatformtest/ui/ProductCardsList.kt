@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.ideaplatformtest.R
 import com.example.ideaplatformtest.domain.ProductCard
 import com.example.ideaplatformtest.ui.theme.IdeaPlatformTestTheme
@@ -35,26 +34,26 @@ import com.example.ideaplatformtest.ui.theme.IdeaPlatformTestTheme
 @Composable
 fun ProductCardsList(
     uiState: ProductCardsUiState,
-    onOpenEditCardDialog: (Int) -> Unit,
-    onDeleteCard: (Int) -> Unit,
+    onAction: (ProductCardAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .padding(horizontal = 16.dp)
+            .fillMaxSize(),
     ) {
         items(uiState.productCardsList, key = { it.id }) { item ->
             ProductCardContent(
                 item = item,
                 onEditCardClick = {
-                    onOpenEditCardDialog(item.amount)
+                    onAction(ProductCardAction.OnOpenEditAmountDialog(item.amount, item.id))
                 },
                 onDeleteCardClick = {
-                    onDeleteCard(item.id)
+                    onAction(ProductCardAction.OnOpenDeleteProductCardDialog(item.id))
                 },
-                modifier = Modifier.animateItem()
+                modifier = Modifier
+                    .animateItem()
+                    .padding(bottom = 16.dp)
             )
         }
     }
@@ -72,35 +71,42 @@ private fun ProductCardContent(
             modifier = Modifier.padding(8.dp)
         ) {
             val weightModifier = Modifier.weight(1f)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = item.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Left,
-                    modifier = weightModifier,
-                )
-                ButtonsBlock(
-                    onEditCardClick = onEditCardClick,
-                    onDeleteCardClick = onDeleteCardClick
-                )
-            }
+            TitleAndButtonsRow(
+                title = item.name,
+                onEditCardClick = onEditCardClick,
+                onDeleteCardClick = onDeleteCardClick,
+                modifier = weightModifier,
+            )
             TagsInChipsList(item.tags)
-            Row {
-                InfoWithTitle(
-                    title = stringResource(R.string.product_cards_screen_amount_info_title),
-                    info = item.amount.toString(),
-                    modifier = weightModifier,
-                )
-                InfoWithTitle(
-                    title = stringResource(R.string.product_cards_screen_date_added_info_title),
-                    info = item.time,
-                    modifier = weightModifier,
-                )
-            }
+            InfoRow(
+                amount = item.amount,
+                date = item.date,
+                modifier = weightModifier,
+            )
         }
+    }
+}
+
+@Composable
+fun TitleAndButtonsRow(
+    title: String,
+    onEditCardClick: () -> Unit,
+    onDeleteCardClick: () -> Unit,
+    modifier: Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Left,
+            modifier = modifier,
+        )
+        ButtonsBlock(
+            onEditCardClick = onEditCardClick,
+            onDeleteCardClick = onDeleteCardClick
+        )
     }
 }
 
@@ -111,8 +117,8 @@ fun TagsInChipsList(
 ) {
     if (tagsList[0] != "")
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalArrangement = Arrangement.spacedBy((-8).dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy((-12).dp)
         ) {
             tagsList.forEach {
                 SuggestionChip(
@@ -120,12 +126,32 @@ fun TagsInChipsList(
                     label = {
                         Text(
                             text = it,
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelMedium
                         )
                     },
                 )
             }
         }
+}
+
+@Composable
+private fun InfoRow(
+    amount: Int,
+    date: String,
+    modifier: Modifier,
+) {
+    Row {
+        InfoWithTitle(
+            title = stringResource(R.string.product_cards_screen_amount_info_title),
+            info = amount.toString(),
+            modifier = modifier,
+        )
+        InfoWithTitle(
+            title = stringResource(R.string.product_cards_screen_date_added_info_title),
+            info = date,
+            modifier = modifier,
+        )
+    }
 }
 
 @Composable
@@ -175,7 +201,7 @@ fun ProductCardContentPreview() {
             item = ProductCard(
                 id = 1,
                 name = "iPhone 13 iPhone 13 iPhone 13 iPhone 13",
-                time = "05.04.2020",
+                date = "05.04.2020",
                 tags = listOf(
                     "new",
                     "good choice",

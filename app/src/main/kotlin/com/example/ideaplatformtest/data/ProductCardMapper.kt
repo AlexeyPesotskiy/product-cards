@@ -13,7 +13,7 @@ class ProductCardMapper @Inject constructor() {
         ProductCard(
             id = id,
             name = name,
-            time = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date(time)),
+            date = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date(time)),
             tags = tags.removeSurrounding("[", "]").split(",").map { tag ->
                 tag.trim().removeSurrounding("\"")
             },

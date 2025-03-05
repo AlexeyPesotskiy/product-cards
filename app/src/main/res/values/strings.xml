@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">ip test</string>
+
     <string name="product_cards_screen_title">Список товаров</string>
     <string name="product_cards_screen_amount_info_title">На складе</string>
     <string name="product_cards_screen_date_added_info_title">Дата добавления</string>
+
+    <string name="edit_product_amount_dialog_title">Количество товара</string>
+    <string name="edit_product_amount_dialog_confirm_button">Принять</string>
+    <string name="edit_product_amount_dialog_dismiss_button">Отмена</string>
+
+    <string name="delete_product_card_dialog_title">Удаление товара</string>
+    <string name="delete_product_card_dialog_confirm_button">Да</string>
+    <string name="delete_product_card_dialog_dismiss_button">Нет</string>
+    <string name="delete_product_card_dialog_text">Вы действительно хотите удалить выбранный товар?</string>
 </resources>
