@@ -10,11 +10,14 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.example.ideaplatformtest.R
 
 @Composable
 fun ProductCardsSearchField(
@@ -32,6 +35,9 @@ fun ProductCardsSearchField(
                 imageVector = Icons.Default.Search,
                 contentDescription = "",
             )
+        },
+        label = {
+            Text(stringResource(R.string.product_cards_search_field_label))
         },
         trailingIcon = {
             if (uiState.searchQuery.isNotEmpty())
@@ -53,6 +59,9 @@ fun ProductCardsSearchField(
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(
+                top = 8.dp,
+                bottom = 16.dp,
+            ),
     )
 }

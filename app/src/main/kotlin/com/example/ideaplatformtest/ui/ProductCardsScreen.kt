@@ -7,19 +7,21 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ideaplatformtest.R
-import com.example.ideaplatformtest.ui.theme.IdeaPlatformTestTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductCardsScreen() {
     val productCardsViewModel: ProductCardsViewModel = hiltViewModel()
@@ -28,11 +30,14 @@ fun ProductCardsScreen() {
         productCardsViewModel.onAction(action)
     }
     val focusManager = LocalFocusManager.current
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
-        topBar = { ProductTopBar() },
-        modifier = Modifier.pointerInput(Unit) {
-            detectTapGestures(onTap = { focusManager.clearFocus() })
-        }
+        topBar = { ProductTopBar(scrollBehavior) },
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = { focusManager.clearFocus() })
+            },
     ) { innerPadding ->
         Column(
             Modifier
@@ -58,16 +63,11 @@ fun ProductCardsScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProductTopBar() {
+private fun ProductTopBar(
+    scrollBehavior: TopAppBarScrollBehavior,
+) {
     CenterAlignedTopAppBar(
         title = { Text(stringResource(R.string.product_cards_screen_title)) },
+        scrollBehavior = scrollBehavior,
     )
-}
-
-@Preview
-@Composable
-fun ProductTopBarPreview() {
-    IdeaPlatformTestTheme {
-        ProductTopBar()
-    }
 }

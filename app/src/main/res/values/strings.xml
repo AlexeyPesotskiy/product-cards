@@ -5,6 +5,8 @@
     <string name="product_cards_screen_amount_info_title">На складе</string>
     <string name="product_cards_screen_date_added_info_title">Дата добавления</string>
 
+    <string name="product_cards_search_field_label">Поиск товаров</string>
+
     <string name="edit_product_amount_dialog_title">Количество товара</string>
     <string name="edit_product_amount_dialog_confirm_button">Принять</string>
     <string name="edit_product_amount_dialog_dismiss_button">Отмена</string>
