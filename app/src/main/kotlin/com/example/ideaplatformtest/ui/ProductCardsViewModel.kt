@@ -2,6 +2,7 @@ package com.example.ideaplatformtest.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ideaplatformtest.domain.ProductCard
 import com.example.ideaplatformtest.domain.ProductCardsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,8 @@ class ProductCardsViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(ProductCardsUiState())
     val uiState = _uiState.asStateFlow()
+
+    private var latestCardList: List<ProductCard> = emptyList()
 
     init {
         observeProductCardsFlow()
@@ -48,15 +51,12 @@ class ProductCardsViewModel @Inject constructor(
 
     private fun updateSearchQuery(newSearchQuery: String) = _uiState.update {
         it.copy(
+            productCardsList = latestCardList.filterBySearchQuery(newSearchQuery),
             searchQuery = newSearchQuery,
         )
     }
 
-    private fun clearSearchQuery() = _uiState.update {
-        it.copy(
-            searchQuery = "",
-        )
-    }
+    private fun clearSearchQuery() = updateSearchQuery("")
 
     private fun openEditProductAmountDialog(currentAmount: Int, productId: Int) = _uiState.update {
         it.copy(
@@ -122,12 +122,17 @@ class ProductCardsViewModel @Inject constructor(
     private fun observeProductCardsFlow() {
         viewModelScope.launch {
             repository.getAllProductsFlow().collect { list ->
+                latestCardList = list
                 _uiState.update { state ->
                     state.copy(
-                        productCardsList = list,
+                        productCardsList = list.filterBySearchQuery(uiState.value.searchQuery),
                     )
                 }
             }
         }
+    }
+
+    private fun List<ProductCard>.filterBySearchQuery(searchQuery: String) = filter {
+        it.name.uppercase().contains(searchQuery.uppercase())
     }
 }

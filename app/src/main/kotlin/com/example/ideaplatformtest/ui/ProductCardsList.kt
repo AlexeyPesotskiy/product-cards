@@ -35,12 +35,9 @@ import com.example.ideaplatformtest.ui.theme.IdeaPlatformTestTheme
 fun ProductCardsList(
     uiState: ProductCardsUiState,
     onAction: (ProductCardAction) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
     ) {
         items(uiState.productCardsList, key = { it.id }) { item ->
             ProductCardContent(
